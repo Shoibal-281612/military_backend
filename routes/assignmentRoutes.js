@@ -2,11 +2,9 @@ const router = require("express").Router();
 const pool = require("../config/db");
 const auth = require("../middleware/authmiddleware");
 
-router.get("/", auth, async (req,res)=>{
-
-try{
-
-const result = await pool.query(`
+router.get("/", auth, async (req, res) => {
+  try {
+    const result = await pool.query(`
 
 SELECT
 b.base_name,
@@ -58,14 +56,10 @@ ON exp.base_id=b.id AND exp.asset_id=a.id
 
 `);
 
-res.json(result.rows);
-
-}catch(err){
-
-res.status(500).json(err.message)
-
-}
-
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
 });
 
-module.exports=router;
+module.exports = router;

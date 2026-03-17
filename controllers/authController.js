@@ -2,41 +2,32 @@ const pool = require("../config/db");
 const jwt = require("jsonwebtoken");
 
 exports.login = async (req, res) => {
+  try {
+    console.log("BODY:", req.body);
 
-try{
+    const { email, password } = req.body;
 
-console.log("BODY:", req.body);
+    const result = await pool.query("SELECT * FROM users WHERE email=$1", [
+      email,
+    ]);
 
-const { email, password } = req.body;
+    if (result.rows.length === 0) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-const result = await pool.query(
-  "SELECT * FROM users WHERE email=$1",
-  [email]
-);
+    const user = result.rows[0];
 
-if(result.rows.length === 0){
-  return res.status(401).json({ message:"Invalid credentials" });
-}
+    if (password !== user.password) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-const user = result.rows[0];
+    const token = jwt.sign({ id: user.id, role: user.role }, "secret", {
+      expiresIn: "1d",
+    });
 
-if(password !== user.password){
-  return res.status(401).json({ message:"Invalid credentials" });
-}
-
-const token = jwt.sign(
-  { id:user.id, role:user.role },
-  "secret",
-  { expiresIn:"1d" }
-);
-
-return res.json({ token });
-
-}catch(err){
-
-console.log(err);
-return res.status(500).json("Server error");
-
-}
-
+    return res.json({ token });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json("Server error");
+  }
 };

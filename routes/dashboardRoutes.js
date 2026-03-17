@@ -2,13 +2,11 @@ const router = require("express").Router();
 const pool = require("../config/db");
 const auth = require("../middleware/authmiddleware");
 
-router.get("/", auth, async (req,res)=>{
+router.get("/", auth, async (req, res) => {
+  try {
+    const { base, asset } = req.query;
 
-try{
-
-const {base,asset} = req.query;
-
-let query = `
+    let query = `
 
 SELECT 
 b.base_name,
@@ -51,32 +49,28 @@ GROUP BY b.base_name, a.name
 ORDER BY b.base_name, a.name;
 `;
 
-let values=[];
-let count=1;
+    let values = [];
+    let count = 1;
 
-if(base){
-query+=` AND b.id=$${count}`;
-values.push(base);
-count++;
-}
+    if (base) {
+      query += ` AND b.id=$${count}`;
+      values.push(base);
+      count++;
+    }
 
-if(asset){
-query+=` AND a.id=$${count}`;
-values.push(asset);
-count++;
-}
+    if (asset) {
+      query += ` AND a.id=$${count}`;
+      values.push(asset);
+      count++;
+    }
 
-const result = await pool.query(query,values);
+    const result = await pool.query(query, values);
 
-res.json(result.rows);
-
-}catch(err){
-
-console.log("Dashboard Error", err);
-res.status(500).json(err.message)
-
-}
-
+    res.json(result.rows);
+  } catch (err) {
+    console.log("Dashboard Error", err);
+    res.status(500).json(err.message);
+  }
 });
 
 module.exports = router;
