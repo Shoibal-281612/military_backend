@@ -8,7 +8,6 @@ app.use(
   cors({
     origin: [
       "https://militaryasset-managementsystem.vercel.app",
-      "https://militaryasset-managementsystem-icvw8tubf-shoibals-projects.vercel.app",
       "http://localhost:3000", // Or whatever port your frontend runs on locally
     ],
     credentials: true,
