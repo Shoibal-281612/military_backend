@@ -11,17 +11,17 @@ exports.login = async (req, res) => {
       email,
     ]);
 
-    if (result.rows.length === 0) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+   if (result.rows.length === 0) {
+  return res.status(401).json({ message: "Invalid credentials" });
+}
 
-    const user = result.rows[0];
+const user = result.rows[0];
 
-    if (password !== user.password) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+if (!user || password !== user.password) {
+  return res.status(401).json({ message: "Invalid credentials" });
+}
 
-    const token = jwt.sign({ id: user.id, role: user.role }, "secret", {
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
 
